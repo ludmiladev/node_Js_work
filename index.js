@@ -9,12 +9,13 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.static("public"));
-app.use(express.urlencoded());
+app.use(express.urlencoded({ extended: true }));
 
 // dotenv.config();
+dotenv.config();
 
-// const PORT = process.env.PORT;
-const PORT = 3002;
+const PORT = process.env.PORT;
+// const PORT = 3002;
 
 app.get("/", (req, res) => {
     res.send("Hello from api");

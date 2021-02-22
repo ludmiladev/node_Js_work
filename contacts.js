@@ -63,7 +63,7 @@ function getContactById({ req, res, contactId }) {
 function addContact({ name, email, phone, res }) {
   getData().then((data) => {
     const contact = {
-        id: _randomInteger(),
+        id: Date.now,
       name,
       email,
       phone,
@@ -75,7 +75,7 @@ function addContact({ name, email, phone, res }) {
         res.status(201).send(contact);
       })
       .catch((err) => {
-        res.send(err);
+          console.log(err);
       });
   });
 }
