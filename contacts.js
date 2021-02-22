@@ -4,8 +4,8 @@ const path = require("path");
 const { promises: fsPromises } = fs;
 const contactsPath = path.join(__dirname, "db", "contacts.json");
 
-// const contacts = fs.readFileSync(contactsPath, "utf-8");
-// const contactsArray = JSON.parse(contacts);
+const contacts = fs.readFileSync(contactsPath, "utf-8");
+const contactsArray = JSON.parse(contacts);
 
 function getData() {
   return fsPromises
