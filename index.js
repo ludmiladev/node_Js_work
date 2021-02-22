@@ -9,70 +9,70 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.static("public"));
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded());
 
-dotenv.config();
+// dotenv.config();
 
-const PORT = process.env.PORT;
-// const PORT = 3002;
+// const PORT = process.env.PORT;
+const PORT = 3002;
 
 app.get("/", (req, res) => {
-  res.send("Hello from api");
-});
-
-app.get("/api/contacts", (req, res) => {
-  contacts.listContacts(req, res);
-});
-
-app.get("/api/contacts/:contactId", (req, res) => {
-  contacts.getContactById({ req, res, contactId: req.params.contactId });
-});
-
-app.delete("/api/contacts/:contactId", (req, res) => {
-  const contactId = req.params.contactId;
-  contacts.removeContact({ req, res, contactId });
-});
+    res.send("Hello from api");
+  });
+  
+  app.get("/api/contacts", (req, res) => {
+    contacts.listContacts(req, res);
+  });
+  
+  app.get("/api/contacts/:contactId", (req, res) => {
+    contacts.getContactById({ req, res, contactId: req.params.contactId });
+  });
+  
+  app.delete("/api/contacts/:contactId", (req, res) => {
+    const contactId = req.params.contactId;
+    contacts.removeContact({ res, contactId });
+  });
 
 //********* */
 app.post(
-  "/api/contacts",
-  (req, res, next) => {
-    const schema = Joi.object({
-      name: Joi.string().required(),
-      email: Joi.string().required(),
-      phone: Joi.string().required(),
-    });
-    const result = Joi.validate( req.body, schema);
-    if (result.error) {
-      res.status(400).send({ message: "missing required name field" });
-    } else {
-      next();
+    "/api/contacts",
+    (req, res, next) => {
+      const schema = Joi.object({
+        name: Joi.string().required(),
+        email: Joi.string().required(),
+        phone: Joi.string().required(),
+      });
+      const result = Joi.validate(req.body, schema);
+      if (result.error) {
+        res.status(400).send(result.error);
+      } else {
+        next();
+      }
+    },
+    (req, res) => {
+      contacts.addContact({ ...req.body, res });
     }
-  },
-  (req, res) => {
-    contacts.addContact({ ...req.body, res });
-  }
-);
+  );
 
-app.patch(
-  "/api/contacts/:contactId",
-  (req, res, next) => {
-    const schema = Joi.object({
-      name: Joi.string(),
-      email: Joi.string(),
-      phone: Joi.string(),
-    });
-    const result = Joi.validate(req.body, schema, res);
-    if (result.error) {
-      res.status(400).send({ message: "missing fields" });
-    } else {
-      next();
+  app.patch(
+    "/api/contacts/:contactId",
+    (req, res, next) => {
+      const schema = Joi.object({
+        name: Joi.string(),
+        email: Joi.string(),
+        phone: Joi.string(),
+      });
+      const result = Joi.validate(req.body, schema);
+      if (result.error) {
+        resp.status(400).send(result.error);
+      } else {
+        next();
+      }
+    },
+    (req, res) => {
+      const id = req.params.contactId;
+      contacts.updateContact({ req, res, id });
     }
-  },
-  (req, res) => {
-    const id = req.params.contactId;
-    contacts.updateContact({ req, res, id });
-  }
 );
 
 app.listen(PORT, () => {
