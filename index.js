@@ -15,7 +15,7 @@ app.use(express.urlencoded({ extended: true }));
 dotenv.config();
 
 const PORT = process.env.PORT;
-// const PORT = 3002;
+
 
 app.get("/", (req, res) => {
     res.send("Hello from api");
@@ -34,7 +34,7 @@ app.get("/", (req, res) => {
       contacts.removeContact({ req, res, contactId });
   });
 
-//********* */
+
 app.post(
     "/api/contacts",
     (req, res, next) => {
