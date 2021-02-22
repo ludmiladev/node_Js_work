@@ -27,6 +27,7 @@
     "webpack-cli": "^4.5.0"
   },
   "dependencies": {
+    "mongoose": "^5.11.17",
     "yargs": "^16.2.0"
   }
 }

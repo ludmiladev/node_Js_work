@@ -1,29 +1,110 @@
-const contacts = require('./contacts.js');
-const argv = require('yargs').argv;
+const express = require("express");
+const { MongoClient, ObjectID } = require("mongodb");
+const Joi = require("joi");
+require("dotenv").config();
 
-function invokeAction({ action, id, name, email, phone }) {
-    switch (action) {
-        case "list":
-            console.table(contacts.listContacts());
-            break;
+const app = express();
 
-        case "get":
-            console.log(contacts.getContactById(id));
-            break;
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-        case "add":
-            contacts.addContact(name, email, phone);
-            console.log(contacts.listContacts);
-            break;
+const url = process.env.dbUrl;
 
-        case "remove":
-            contacts.removeContact(id);
-            console.log(contacts.listContacts);
-            break;
+const dbName = "db-contacts";
 
-        default:
-            console.warn("\x1B[31m Unknown action type!");
-    }
+let db;
+
+function validateContact(req, res, next) {
+    const schema = Joi.object().keys({
+        name: Joi.string().required(),
+        email: Joi.string().required(),
+        phone: Joi.string().required(),
+    });
+
+    const result = Joi.validate(req.body, schema);
+
+    if (result.error) return res.status(400).send(result.error);
+
+    next();
 }
+app.get("/", (req, res) => {
+    res.send("hello from API");
+});
+app.get("/contacts", (req, res) => {
+    db.collection("contacts")
+        .find()
+        .toArray((err, docs) => {
+            if (err) return res.sendStatus(500);
 
-invokeAction(argv);
+            res.send(docs);
+        });
+});
+
+app.post("/contacts", validateContact, (req, res) => {
+    const contact = {
+        name: req.body.name,
+        email: req.body.email,
+        phone: req.body.phone,
+    };
+
+    db.collection("contacts").insertOne(contact, (err) => {
+        if (err) return res.sendStatus(500);
+
+        res.status(200).json(contact);
+    });
+});
+
+    app.get("/contacts/:id", (req, res) => {
+        db.collection("contacts").findOne(
+            { _id: ObjectID(req.params.id) },
+            (err, docs) => {
+                if (err) return res.sendStatus(500);
+
+                res.status(200).json(docs);
+            }
+        );
+    });
+
+    app.put("/contacts/:id", validateContact, (req, res) => {
+        db.collection("contacts").updateOne(
+            { _id: ObjectID(req.params.id) },
+            {
+                $set: {
+                    name: req.body.name,
+                    email: req.body.email,
+                    phone: req.body.phone,
+                },
+            },
+            (err, docs) => {
+                if (err) return res.sendStatus(500);
+                res.status(200).send("was upd");
+            }
+        );
+    });
+
+    app.delete("/contacts/:id", (req, res) => {
+        db.collection("contacts").deleteOne(
+            { _id: ObjectID(req.params.id) },
+            (err, result) => {
+                if (err) return res.sendStatus(500);
+                res.status(200).send("was del");
+            }
+        );
+    });
+
+    MongoClient.connect(
+        url,
+        { useNewUrlParser: true, useUnifiedTopology: true },
+        (err, databaseConect) => {
+            if (err) return console.log(err);
+
+            console.log("Connected successfully to BD");
+
+            db = databaseConect.db(dbName);
+
+            app.listen(process.env.PORT, () => {
+
+                console.log("app is runnin on port " + process.env.PORT);
+            });
+        }
+    );
