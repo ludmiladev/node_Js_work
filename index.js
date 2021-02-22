@@ -31,7 +31,7 @@ app.get("/", (req, res) => {
   
   app.delete("/api/contacts/:contactId", (req, res) => {
     const contactId = req.params.contactId;
-    contacts.removeContact({ res, contactId });
+      contacts.removeContact({ req, res, contactId });
   });
 
 //********* */
