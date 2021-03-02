@@ -14,4 +14,15 @@ router.get('/auth', authorize, UserController.authUser);
 router.get('/auth/logout/:userId', authorize, UserController.logout);
 router.get('/users/current', authorize, UserController.getCurrentUser);
 
-module.exports = router;
+// router.post('/users',
+//   UserController.upload.single('userAvatar'),
+//   (req, res) => {res.send({ file: req.file, ...req.body });},);
+
+router.patch(
+    '/users/userAvatar',
+    authorize,
+    UserController.upload.single('userAvatar'),
+    UserController.validateUpdateUser,
+    UserController.updateUserAvatar,
+),
+    (module.exports = router);
