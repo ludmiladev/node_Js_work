@@ -1,110 +1,61 @@
-const express = require("express");
-const { MongoClient, ObjectID } = require("mongodb");
-const Joi = require("joi");
-require("dotenv").config();
+const express = require('express');
+const mongoose = require('mongoose');
+const dotenv = require('dotenv');
+var cors = require('cors');
+const morgan = require('morgan');
+const contactsRouter = require('./routes/contacts.routes');
 
-const app = express();
+dotenv.config();
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+const MONGO_URI = process.env.DB_CLOUD;
 
-const url = process.env.dbUrl;
+const PORT = process.env.port || 8080;
 
-const dbName = "db-contacts";
+class Server {
+    constructor() {
+        this.server = null;
+    }
+    start() {
+        this.server = express();
+        this.initMiddlewares();
+        this.initRoutes();
+        this.listen();
+        this.connectToDb();
+    }
 
-let db;
+    initMiddlewares() {
+        this.server.use(express.json());
+        this.server.use(cors({ origin: '*' }));
+        this.server.use(morgan('combined'));
+    }
 
-function validateContact(req, res, next) {
-    const schema = Joi.object().keys({
-        name: Joi.string().required(),
-        email: Joi.string().required(),
-        phone: Joi.string().required(),
-    });
+    initRoutes() {
+        this.server.use('/contacts', contactsRouter);
+    }
 
-    const result = Joi.validate(req.body, schema);
-
-    if (result.error) return res.status(400).send(result.error);
-
-    next();
-}
-app.get("/", (req, res) => {
-    res.send("hello from API");
-});
-app.get("/contacts", (req, res) => {
-    db.collection("contacts")
-        .find()
-        .toArray((err, docs) => {
-            if (err) return res.sendStatus(500);
-
-            res.send(docs);
-        });
-});
-
-app.post("/contacts", validateContact, (req, res) => {
-    const contact = {
-        name: req.body.name,
-        email: req.body.email,
-        phone: req.body.phone,
-    };
-
-    db.collection("contacts").insertOne(contact, (err) => {
-        if (err) return res.sendStatus(500);
-
-        res.status(200).json(contact);
-    });
-});
-
-    app.get("/contacts/:id", (req, res) => {
-        db.collection("contacts").findOne(
-            { _id: ObjectID(req.params.id) },
-            (err, docs) => {
-                if (err) return res.sendStatus(500);
-
-                res.status(200).json(docs);
+    async connectToDb() {
+        try {
+            if (
+                await mongoose.connect(MONGO_URI, {
+                    useNewUrlParser: true,
+                    useUnifiedTopology: true,
+                    useCreateIndex: true,
+                })
+            ) {
+                console.log('Database connection successful');
             }
-        );
-    });
-
-    app.put("/contacts/:id", validateContact, (req, res) => {
-        db.collection("contacts").updateOne(
-            { _id: ObjectID(req.params.id) },
-            {
-                $set: {
-                    name: req.body.name,
-                    email: req.body.email,
-                    phone: req.body.phone,
-                },
-            },
-            (err, docs) => {
-                if (err) return res.sendStatus(500);
-                res.status(200).send("was upd");
-            }
-        );
-    });
-
-    app.delete("/contacts/:id", (req, res) => {
-        db.collection("contacts").deleteOne(
-            { _id: ObjectID(req.params.id) },
-            (err, result) => {
-                if (err) return res.sendStatus(500);
-                res.status(200).send("was del");
-            }
-        );
-    });
-
-    MongoClient.connect(
-        url,
-        { useNewUrlParser: true, useUnifiedTopology: true },
-        (err, databaseConect) => {
-            if (err) return console.log(err);
-
-            console.log("Connected successfully to BD");
-
-            db = databaseConect.db(dbName);
-
-            app.listen(process.env.PORT, () => {
-
-                console.log("app is runnin on port " + process.env.PORT);
-            });
+        } catch (error) {
+            console.log(err.message);
+            process.exit(1);
         }
-    );
+    }
+
+    listen() {
+        this.server.listen(PORT, () => {
+            console.log('server is started in:', PORT);
+        });
+    }
+}
+
+const server = new Server();
+server.start();
