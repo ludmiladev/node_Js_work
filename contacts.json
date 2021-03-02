@@ -8,3 +8,4 @@
 {"_id":{"$oid":"5eb074232c30a1378dacdbe1"},"name":"Simon Morton","email":"dui.Fusce.diam@Donec.com","phone":"(233) 738-2360","subscription":"pro","password":"password","token":""}
 {"_id":{"$oid":"5eb074232c30a1378dacdbe2"},"name":"Thomas Lucas","email":"nec@Nulla.com","phone":"(704) 398-7993","subscription":"free","password":"password","token":""}
 {"_id":{"$oid":"5eb074232c30a1378dacdbe3"},"name":"Alec Howard","email":"Donec.elementum@scelerisquescelerisquedui.net","phone":"(748) 206-2688","subscription":"premium","password":"password","token":""}
+
