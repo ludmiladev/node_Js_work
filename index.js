@@ -1,3 +1,4 @@
+
 const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
@@ -38,11 +39,11 @@ class Server {
   async connectToDb() {
     try {
       if (
-        await mongoose.connect(MONGO_URI, {
-          useNewUrlParser: true,
-          useUnifiedTopology: true,
-          useCreateIndex: true,
-        })
+          await mongoose.connect(MONGO_URI, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+            useCreateIndex: true,
+          })
       ) {
         console.log('Database connection successful');
       }
