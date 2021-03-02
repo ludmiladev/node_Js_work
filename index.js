@@ -1,10 +1,12 @@
+
 const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 var cors = require('cors');
 const morgan = require('morgan');
 const contactsRouter = require('./routes/contacts.routes');
-const userRouter = require('./routes/users.routes'); //
+const userRouter = require('./routes/users.routes'); //auth
+const path = require('path');
 
 dotenv.config();
 
@@ -28,11 +30,13 @@ class Server {
         this.server.use(express.json());
         this.server.use(cors({ origin: '*' }));
         this.server.use(morgan('combined'));
+        // his.server.use('/images', express.static('public/images'))
+        this.server.use('/images', express.static(path.join('public/images'))); //(images) статична роздача папки public по роуту /images
     }
 
     initRoutes() {
         this.server.use('/contacts', contactsRouter);
-        this.server.use('', userRouter); //
+        this.server.use('', userRouter); //auth
     }
 
     async connectToDb() {
