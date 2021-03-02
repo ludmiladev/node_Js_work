@@ -6,7 +6,7 @@ dotenv.config();
 
 //мідлвара
 async function authorize(req, res, next) {
-
+    console.log('authorize start!!!');
     const authorizationHeader = req.get('Authorization'); // дістаємо хедер з req, за допом. метода get і вказуєм ключ заголовку(хедера) "Authorization", з заголовка дістаєм токен
     if (!authorizationHeader) {
         // провірка якщо хедера нема
