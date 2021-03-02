@@ -15,9 +15,6 @@ const { string } = require('joi');
 dotenv.config();
 mongoose.set('useFindAndModify', false);
 
-// як заюзати const PORT = process.env.port || 8080; з index.js в newAvtarUrl в deleteUrl в avatarURL  PORT=8080
-// const newAvtarUrl = `http://localhost:${process.env.PORT}/images/${newAvatar}.png`;
-
 class UserController {
     PORT = process.env.port || 8080;
 
@@ -31,8 +28,6 @@ class UserController {
             const hashedPassword = await bcrypt.hash(body.password, 14);
 
             const newAvtarUrl = `http://localhost:${PORT}/images/${newAvatar}.png`;
-            // const newAvtarUrl = `http://localhost:${process.env.PORT || 8080}/images/${newAvatar}.png`;
-            // const newAvtarUrl = `http://localhost:8080/images/${newAvatar}.png`; // записую url для кожного юзера
 
             const createUser = await User.create({
                 ...body,
