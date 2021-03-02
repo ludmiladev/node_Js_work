@@ -1,29 +1,63 @@
-const contacts = require('./contacts.js');
-const argv = require('yargs').argv;
+const express = require('express');
+const mongoose = require('mongoose');
+const dotenv = require('dotenv');
+var cors = require('cors');
+const morgan = require('morgan');
+const contactsRouter = require('./routes/contacts.routes');
+const userRouter = require('./routes/users.routes'); //
 
-function invokeAction({ action, id, name, email, phone }) {
-    switch (action) {
-        case "list":
-            console.table(contacts.listContacts());
-            break;
+dotenv.config();
 
-        case "get":
-            console.log(contacts.getContactById(id));
-            break;
+const MONGO_URI = process.env.DB_CLOUD;
 
-        case "add":
-            contacts.addContact(name, email, phone);
-            console.log(contacts.listContacts);
-            break;
+const PORT = process.env.port || 8080;
 
-        case "remove":
-            contacts.removeContact(id);
-            console.log(contacts.listContacts);
-            break;
+class Server {
+  constructor() {
+    this.server = null;
+  }
+  start() {
+    this.server = express();
+    this.initMiddlewares();
+    this.initRoutes();
+    this.listen();
+    this.connectToDb();
+  }
 
-        default:
-            console.warn("\x1B[31m Unknown action type!");
+  initMiddlewares() {
+    this.server.use(express.json());
+    this.server.use(cors({ origin: '*' }));
+    this.server.use(morgan('combined'));
+  }
+
+  initRoutes() {
+    this.server.use('/contacts', contactsRouter);
+    this.server.use('', userRouter); //
+  }
+
+  async connectToDb() {
+    try {
+      if (
+        await mongoose.connect(MONGO_URI, {
+          useNewUrlParser: true,
+          useUnifiedTopology: true,
+          useCreateIndex: true,
+        })
+      ) {
+        console.log('Database connection successful');
+      }
+    } catch (error) {
+      console.log(err.message);
+      process.exit(1);
     }
+  }
+
+  listen() {
+    this.server.listen(PORT, () => {
+      console.log('server is started in:', PORT);
+    });
+  }
 }
 
-invokeAction(argv);
+const server = new Server();
+server.start();
