@@ -17,6 +17,6 @@ const UserSchema = new Schema({
 
     token: String,
 });
-//створиться mongo колекція як users
+
 const User = mongoose.model('User', UserSchema);
 module.exports = User;
