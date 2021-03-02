@@ -195,13 +195,11 @@ class UserController {
                     {
                         ...req.body,
                         avatarURL: `http://localhost:${PORT}/images/${req.file.filename}`,
-                        // avatarURL: `http://localhost:8080/images/${req.file.filename}`,
                     },
                     { new: true },
                 );
                 return res.status(200).json({
                     avatarURL: `http://localhost:${PORT}/images/${req.file.filename}`,
-                    // avatarURL: `http://localhost:8080/images/${req.file.filename}`,
                 });
 
             default:
