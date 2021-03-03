@@ -1,4 +1,3 @@
-
 const { Router } = require('express');
 const UserController = require('../controllers/users.controllers');
 const { authorize } = require('../controllers/authController.js');
